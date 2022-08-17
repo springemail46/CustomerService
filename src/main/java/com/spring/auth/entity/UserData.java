@@ -11,6 +11,7 @@ public class UserData {
     private long id;
     private String username;
     private String password;
+    private String role;
 
     public long getId() {
         return id;
@@ -34,5 +35,13 @@ public class UserData {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

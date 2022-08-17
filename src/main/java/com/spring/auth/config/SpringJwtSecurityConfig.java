@@ -30,7 +30,7 @@ public class SpringJwtSecurityConfig  extends WebSecurityConfigurerAdapter {
     private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
+    public void configure(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
     @Bean
@@ -48,7 +48,8 @@ public class SpringJwtSecurityConfig  extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeHttpRequests()
-                .antMatchers("/hello").hasAnyRole("USER","ADMIN")
+                .antMatchers("/helloadmin").hasRole("ADMIN")
+                .antMatchers("/hellouser").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/authenticate","/register").permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
