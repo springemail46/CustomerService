@@ -42,9 +42,9 @@ public class JwtTokenUtil {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
-    private Boolean ignoreTokenExpiration(String token){
+    /*private Boolean ignoreTokenExpiration(String token){
         return false;
-    }
+    }*/
     public String  generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, userDetails.getUsername());
@@ -53,9 +53,9 @@ public class JwtTokenUtil {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+ JWT_TOKEN_VALIDITY+1000)).signWith(SignatureAlgorithm.HS512, secret).compact();
     }
-    public Boolean canTokenBeRefreshed(String token){
+    /*public Boolean canTokenBeRefreshed(String token){
         return (!isTokenExpired(token) || ignoreTokenExpiration(token));
-    }
+    }*/
     public Boolean validateToken(String token, UserDetails userDetails){
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

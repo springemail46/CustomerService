@@ -1,7 +1,6 @@
 package com.spring.entity;
 
 import lombok.Data;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.persistence.*;
 
@@ -17,6 +16,7 @@ public class Customer {
     private String address;
     private String email;
     private String phone;
+    private int age;
     private int pid;
 
 }

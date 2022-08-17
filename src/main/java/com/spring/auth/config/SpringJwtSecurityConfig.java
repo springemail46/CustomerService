@@ -47,7 +47,9 @@ public class SpringJwtSecurityConfig  extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeHttpRequests().antMatchers("/authenticate","/register").permitAll()
+                .authorizeHttpRequests()
+                .antMatchers("/hello").hasAnyRole("USER","ADMIN")
+                .antMatchers("/authenticate","/register").permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

@@ -1,6 +1,5 @@
 package com.spring.auth.service;
 
-import com.netflix.discovery.converters.Auto;
 import com.spring.auth.entity.UserData;
 import com.spring.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
