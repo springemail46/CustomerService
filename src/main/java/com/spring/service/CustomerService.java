@@ -3,14 +3,13 @@ package com.spring.service;
 import com.spring.classes.MyOrders;
 import com.spring.classes.Product;
 import com.spring.entity.Customer;
+import com.spring.exception.CustomerServiceException;
 import com.spring.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.RejectedExecutionException;
 
 @Service
@@ -23,19 +22,46 @@ public class CustomerService {
     RestTemplate restTemplate;
 
     public Customer saveCustomer(Customer customer){
-        return repository.save(customer);
+        if(customer.getCname().isEmpty() || customer.getCname().length() ==0){
+            throw new CustomerServiceException("701","Please enter your customer name ");
+        }
+        try{
+            Customer saveCustomer = repository.save(customer);
+            return saveCustomer;
+        }catch (IllegalArgumentException ex){
+            throw new CustomerServiceException("702","Given customer detils is null"+ex.getMessage());
+        }catch (Exception ex){
+            throw new CustomerServiceException("703","Something went wrong in service layer "+ex.getMessage());
+        }
     }
     public MyOrders getCustomer(int cid){
-       Customer customer = repository.findById(cid).get();
-       int pid = customer.getPid();
-        Product product = restTemplate.getForObject("http://PRODUCTSERVICE/product/"+pid, Product.class);
         MyOrders myOrders = new MyOrders();
-        myOrders.setCustomer(customer);
+        Optional<Customer> customer=null;
+        try {
+             customer = repository.findById(cid);
+        }catch (IllegalArgumentException ex){
+            throw new CustomerServiceException("706","Given customer id is null, please provide valid customer id "+ex.getMessage());
+        }catch (NoSuchElementException ex){
+            throw new CustomerServiceException("707","Given Customer dose not exist in database"+ex.getMessage());
+        }
+       int pid = customer.get().getPid();
+        Product product = restTemplate.getForObject("http://PRODUCTSERVICE/product/"+pid, Product.class);
+
+        myOrders.setCustomer(customer.get());
         myOrders.setProduct(product);
         return myOrders;
     }
     public List<Customer> getAllCustomer(){
-        return repository.findAll();
+        List<Customer> customerList;
+        try {
+            customerList = repository.findAll();
+            if(customerList.isEmpty()){
+                throw new CustomerServiceException("704","Customer list is empty while fetching data from database ");
+            }
+        }catch (Exception ex){
+            throw new CustomerServiceException("705","Something went worng while fetching customer details "+ex.getMessage());
+        }
+        return customerList;
     }
     public Customer updateCustomer(Customer customer, int cid){
         return repository.findById(cid).map(c ->{

@@ -10,12 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Function;
 
 @Service
 public class JwtTokenUtil {
 
-    @Value("${jwt.secret}")
     private String secret;
 
     private int jwtExpirationInMs;
@@ -31,16 +29,10 @@ public class JwtTokenUtil {
     }
 
     public String getUsernameFromToken(String token){
-        return getClaimFromToken(token, Claims ::getSubject);
+        Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return claims.getSubject();
     }
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver){
-        final Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
-    }
-    private Claims getAllClaimsFromToken(String token){
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-    }
     public List<SimpleGrantedAuthority> getRolesFromToken(String token){
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
         List<SimpleGrantedAuthority> roles = null;
@@ -57,9 +49,7 @@ public class JwtTokenUtil {
         }
         return roles;
     }
-    /*private Boolean ignoreTokenExpiration(String token){
-        return false;
-    }*/
+
     public String  generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
@@ -75,9 +65,7 @@ public class JwtTokenUtil {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+ jwtExpirationInMs)).signWith(SignatureAlgorithm.HS512, secret).compact();
     }
-    /*public Boolean canTokenBeRefreshed(String token){
-        return (!isTokenExpired(token) || ignoreTokenExpiration(token));
-    }*/
+
     public Boolean validateToken(String token){
         try{
             Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);

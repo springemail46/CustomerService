@@ -64,7 +64,7 @@ public class AppConfiguration {
         return new ApiInfoBuilder()
                 .title("Customer Services")
                 .description("Customer Service Details ")
-                .version("1.0")
+                .version("2.0")
                 .build();
     }
 }
